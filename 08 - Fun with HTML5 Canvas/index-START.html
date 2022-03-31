@@ -1,19 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>HTML5 Canvas</title>
-</head>
-<body>
-<canvas id="draw" width="800" height="800"></canvas>
-<script>
-</script>
+  <head>
+    <meta charset="UTF-8" />
+    <title>HTML5 Canvas</title>
+  </head>
+  <body>
+    <canvas id="draw" width="800" height="800"></canvas>
+    <script>
+      const canvas = document.getElementById("draw");
+      const ctx = canvas.getContext("2d");
+      const colors = ["#2185C5", "#7ECEFD", "#FFF6E5", "#FF7F66"];
 
-<style>
-  html, body {
-    margin: 0;
-  }
-</style>
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
 
-</body>
+      ctx.lineJoin = "round";
+      ctx.lineCap = "round";
+      ctx.lineWidth = 10;
+
+      let isDrawing = false;
+      let lastX = 0; // lastX and lastY are used to keep track of the last position of the mouse
+      let lastY = 0;
+      let hue = 0;
+      let direction = true;
+
+      function draw(e) {
+        if (!isDrawing) return; // stop the fn from running when they are not moused down
+        ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`; // change the color of the line depending on the hue
+
+        ctx.beginPath(); // begin the path
+        ctx.moveTo(lastX, lastY); // start from
+        ctx.lineTo(e.offsetX, e.offsetY); // e.offsetX and e.offsetY are the coordinates of the mouse
+        ctx.stroke(); // draw it!
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+
+        hue++;
+        if (hue >= 360) {
+          hue = 0;
+        }
+
+        if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+          direction = !direction;
+        }
+        ctx.lineWidth = ctx.lineWidth + (direction ? 1 : -1);
+      }
+
+      canvas.addEventListener("mousedown", (e) => {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+      });
+
+      canvas.addEventListener("mousemove", draw);
+      canvas.addEventListener("mouseup", () => (isDrawing = false));
+      canvas.addEventListener("mouseout", () => (isDrawing = false));
+    </script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+    </style>
+  </body>
 </html>
